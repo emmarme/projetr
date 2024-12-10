@@ -1,0 +1,95 @@
+library(randomForest)
+library(caret)
+
+#Clean dataset
+data <- read.csv("C:/Users/emmar/Github/projetr/data.csv")
+data<-data[, !names(data) %in% c("id","X")]
+data$diagnosis<-factor(data$diagnosis, levels=c("B","M"), labels=c(0,1))
+
+#Graph
+counts<- table(data$diagnosis)
+
+freq<-round(counts/sum(counts)*100)
+
+labels<-paste(names(counts), freq, "%")
+
+pie(counts, labels=labels, col = c("blue", "lightblue"), main="Répartition Malin/Benin")
+
+legend("topright", legend = labels, fill = c("blue", "lightblue"))
+
+#Hist
+hist(data$radius_mean, main="Histogramme radius_mean")
+hist(data$area_mean, main="Histogramme area_mean")
+hist(data$smoothness_se, main="Histogramme smoothness_se")
+hist(data$radius_se, main="Histogramme radius_se")
+hist(data$smoothness_worst, main="Histogramme smoothness_worst")
+hist(data$symmetry_worst, main="Histogramme symmetry_worst")
+
+#Boxplot
+boxplot(data$radius_mean~data$diagnosis, main="Boxplot of radius_mean by Diagnosis",xlab = "Diagnosis",
+        ylab = "radius_mean")
+boxplot(data$area_mean~data$diagnosis, main="Boxplot of area_mean by Diagnosis",xlab = "Diagnosis",
+        ylab = "area_mean")
+boxplot(data$smoothness_se~data$diagnosis, main="Boxplot of smoothness_se by Diagnosis",xlab = "Diagnosis",
+        ylab = "smoothness_se")
+boxplot(data$radius_se~data$diagnosis, main="Boxplot of radius_se by Diagnosis",xlab = "Diagnosis",
+        ylab = "radius_se")
+boxplot(data$smoothness_worst~data$diagnosis,main="Boxplot of smoothness_worst by Diagnosis",xlab = "Diagnosis",
+        ylab = "smoothness_worst")
+boxplot(data$symmetry_worst~data$diagnosis, main="Boxplot of symmetry_worst by Diagnosis",xlab = "Diagnosis",
+        ylab = "symmetry_worst")
+
+
+train_model<-function(data){
+
+  X<-data[, !names(data) %in% c("diagnosis")]
+  y<-data$diagnosis
+
+  set.seed(123)
+  train_index<-createDataPartition(y,p= 0.7, list=FALSE)
+
+  X_train<- X[train_index,]
+  X_test<- X[-train_index,]
+
+  y_train<- y[train_index]
+  y_test<- y[-train_index]
+
+  model<- randomForest(x=X_train, y=as.factor(y_train), ntree=100, maxnodes=6)
+
+  y_pred<-predict(model, newdata=X_test)
+
+  return(list(model=model, y_test=y_test, y_pred=y_pred))
+
+}
+
+resultats<- train_model(data)
+print(resultats$model)
+
+
+evaluate_model<- function(y_test, y_pred){
+  #Calcul de l'accuracy
+  accuracy<- sum(y_test==y_pred)/length(y_test)
+  cat("Accuracy :", accuracy, "\n")
+
+  #Matrice de confusion
+  cm<-confusionMatrix(as.factor(y_pred), as.factor(y_test))
+  cat("Matrice de confusion :", "\n")
+  print(cm$table)
+
+  #Recall, precision, f1_score
+  recall_score <- cm$byClass["Sensitivity"]
+  f1_score <- cm$byClass["F1"]
+  precision_score <- cm$byClass["Pos Pred Value"]
+
+  # Affichage des résultats
+  cat("Recall:", recall_score, "\n")
+  cat("F1 Score:", f1_score, "\n")
+  cat("Precision:", precision_score, "\n")
+
+
+  return(list(accuracy = accuracy, confusion_matrix = cm$table,
+              precision = precision_score, recall = recall_score, f1_score = f1_score))
+}
+
+resultats2<-evaluate_model(resultats$y_test, resultats$y_pred)
+
