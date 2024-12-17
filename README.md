@@ -6,4 +6,8 @@ devtools::install_github("emmarme/projetr")
 
 Pour lancer l'App Shiny sur le cancer du seins:
 
-shiny::runApp(system.file("shiny cancer du sein.R", package="projetr"))
+shiny::runApp(system.file("shiny_cancer_du_sein.R", package="projetr"))
+
+Pour Lancer l'App Shiny sur la gymnastique:
+
+shiny::runApp(system.file("shiny-gymnastique.R", package="projetr"))
