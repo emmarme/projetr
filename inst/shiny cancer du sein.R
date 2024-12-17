@@ -1,4 +1,3 @@
-
 library(shiny)
 library(shinydashboard)
 library(ggplot2)
@@ -73,7 +72,7 @@ ui <- dashboardPage(
       tabItem(tabName = "graphiqueinterractif",
               fluidPage(
                 h2("Bougez le curseur !"),
-                sliderInput("slider_graph", "Choisissez un paramètre:", 
+                sliderInput("slider_graph", "Choisissez un paramètre:",
                             min = 0, max = max(data$radius_mean), value = 100, step = 10),
                 plotlyOutput("interactive_plot")  # Graphique interactif
               )
@@ -84,7 +83,7 @@ ui <- dashboardPage(
 
 # Serveur
 server <- function(input, output) {
-  
+
   # Histogrammes
   output$hist_radius_mean <- renderPlot({
     hist(data$radius_mean, main = "Histogramme radius_mean", col = "lightblue", border = "white")
@@ -104,52 +103,52 @@ server <- function(input, output) {
   output$hist_symmetry_worst <- renderPlot({
     hist(data$symmetry_worst, main = "Histogramme symmetry_worst", col = "lightblue", border = "white")
   })
-  
+
   # Boxplots avec ggplot2
   output$boxplot_radius_mean <- renderPlot({
     ggplot(data, aes(x = factor(0), y = radius_mean)) +
       geom_boxplot(fill = "lightblue") +
       labs(title = "Boxplot of radius_mean", x = "", y = "radius_mean")
   })
-  
+
   output$boxplot_area_mean <- renderPlot({
     ggplot(data, aes(x = factor(0), y = area_mean)) +
       geom_boxplot(fill = "lightblue") +
       labs(title = "Boxplot of area_mean", x = "", y = "area_mean")
   })
-  
+
   output$boxplot_smoothness_se <- renderPlot({
     ggplot(data, aes(x = factor(0), y = smoothness_se)) +
       geom_boxplot(fill = "lightblue") +
       labs(title = "Boxplot of smoothness_se", x = "", y = "smoothness_se")
   })
-  
+
   output$boxplot_radius_se <- renderPlot({
     ggplot(data, aes(x = factor(0), y = radius_se)) +
       geom_boxplot(fill = "lightblue") +
       labs(title = "Boxplot of radius_se", x = "", y = "radius_se")
   })
-  
+
   output$boxplot_smoothness_worst <- renderPlot({
     ggplot(data, aes(x = factor(0), y = smoothness_worst)) +
       geom_boxplot(fill = "lightblue") +
       labs(title = "Boxplot of smoothness_worst", x = "", y = "smoothness_worst")
   })
-  
+
   output$boxplot_symmetry_worst <- renderPlot({
     ggplot(data, aes(x = factor(0), y = symmetry_worst)) +
       geom_boxplot(fill = "lightblue") +
       labs(title = "Boxplot of symmetry_worst", x = "", y = "symmetry_worst")
   })
-  
+
   # Graphique interactif (avec plotly)
   output$interactive_plot <- renderPlotly({
     # Filtrage des données en fonction du curseur
     filtered_data <- data[data$radius_mean <= input$slider_graph, ]
-    
+
     # Créez un graphique interactif avec plotly
-    plot_ly(filtered_data, x = ~radius_mean, y = ~area_mean, 
-            type = 'scatter', mode = 'markers', 
+    plot_ly(filtered_data, x = ~radius_mean, y = ~area_mean,
+            type = 'scatter', mode = 'markers',
             marker = list(color = 'blue')) %>%
       layout(title = 'Graphique interactif des données',
              xaxis = list(title = 'Radius Mean'),
