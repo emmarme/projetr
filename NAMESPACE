@@ -2,3 +2,4 @@
 export(train_model)
 export(evaluate_model)
 export(run_my_shiny_app)
+export(run_my_shiny_gym)
