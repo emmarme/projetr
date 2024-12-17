@@ -1,4 +1,4 @@
-Quelques aides pour l'installation e l'utilisation de notre package !
+Quelques aides pour l'installation et l'utilisation de notre package !
 
 Pour installer le package R:
 
